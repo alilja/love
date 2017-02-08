@@ -1,4 +1,6 @@
 function love.load()
+	inspect = require('lib.inspect')
+
 	player = {}
 	player.x = 100
 	player.y = 300
@@ -8,7 +10,7 @@ function love.load()
 	acceleration = 50 -- pixels per second
 	max_velocity = 600
 
-	jump_force = -950
+	jump_force = -1050
 	jump_cutoff = -300 -- if your speed is below this, you are fixed to this speed
 					   -- basically, the lower this number, the sooner you are fixed
 					   -- to a low jump
@@ -26,12 +28,16 @@ function love.load()
 
 	-- how movement changes in the air
 	air_accel_control = 2.2
-	air_vel_control = 0.7
-	air_reactivity = 0.3
+	air_vel_control = 0.84
+	air_reactivity = 0.6
 	air_decay = 0.97
+
+	combos = {}
+	combo_time = 0
+	max_combo_time = 0.5
 end
 
-function calculate_horizontal_speed(direction, time_since_press, velocity)
+function calculate_horizontal_speed(direction, velocity)
 	reactivity = reactivity_percent
 	if is_jumping then
 		acceleration = acceleration * air_accel_control
@@ -66,9 +72,18 @@ function love.keypressed(key)
 	elseif key == "space" and is_jumping then
 		if player.y >= 300 - jump_tolerance then
 			jump_tolerance_trigger = true
-			print("tolerance")
+			print("tolerance jump")
 		end
 	end
+	if key == "a" then
+		print("a pressed")
+		table.insert(combos, "a")
+	end
+	if key == "s" then
+		print("s pressed")
+		table.insert(combos, "s")
+	end
+
 end
 
 function love.keyreleased(key)
@@ -79,12 +94,41 @@ function love.keyreleased(key)
    end
 end
 
+function check_combos(combos)
+	if #combos == 2 then
+		if combos[1] == "a" then
+			if combos[2] == "a" then
+				return "double a"
+			end
+		end
+	elseif #combos == 3 then
+		if combos[1] == "a" then
+			if combos[2] == "s" then
+				if combos[3] == "s" then
+					return "ass"
+				end
+			end
+		end
+	elseif #combos == 4 then
+		if combos[1] == "a" then
+			if combos[2] == "s" then
+				if combos[3] == "a" then
+					if combos[4] == "s" then
+						return "asas"
+					end
+				end
+			end
+		end
+	end
+	return nil
+end
+
 
 function love.update(dt)
 	if love.keyboard.isDown("right") then
-		vel = calculate_horizontal_speed("right", right_key_down_time, vel)
+		vel = calculate_horizontal_speed("right", vel)
 	elseif love.keyboard.isDown("left") then
-		vel = calculate_horizontal_speed("left", left_key_down_time, vel)
+		vel = calculate_horizontal_speed("left", vel)
 	else
 		if is_jumping then
 			vel = vel * air_decay
@@ -93,11 +137,33 @@ function love.update(dt)
 		end
 	end
 
+	if next(combos) ~= nil then
+		combo_time = combo_time + dt
+
+		combo = check_combos(combos)
+		if combo_time >= max_combo_time or combo ~= nil then
+			print(combo)
+			combos = {}
+			combo_time = 0
+
+			if combo == "double a" then
+				vel = vel * 30
+			elseif combo == "ass" then
+				vel = 0
+			elseif combo == "asas" then
+				jump_vel = jump_vel - 2000
+			end
+		end
+	end
+
 	jump_vel = jump_vel + gravity
 	if jump_vel > 500 then jump_vel = 500 end
 
 	player.x = player.x + vel * dt
 	player.y = player.y + jump_vel * dt
+	if player.y >= 300 and is_jumping then
+		love.timer.sleep(0.02)
+	end
 	if player.y >= 300 then
 		player.y = 300
 		jump_vel = 500
