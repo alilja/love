@@ -1,14 +1,18 @@
 function love.load()
 	inspect = require('lib.inspect')
 
+	love.window.setMode(1216, 760, {})
+
 	player = {}
 	player.x = 100
 	player.y = 300
+	player.height = 30
+	player.width = 20
 
 	vel = 0
-	decay = 0.85
-	acceleration = 50 -- pixels per second
-	max_velocity = 600
+	decay = 0.74
+	acceleration = 80 -- pixels per second
+	max_velocity = 700
 
 	jump_force = -1050
 	jump_cutoff = -300 -- if your speed is below this, you are fixed to this speed
@@ -21,14 +25,14 @@ function love.load()
 	reactivity_percent = 1.95 -- how quickly you start moving in the opposite direction
 
 	jump_vel = 0
-	gravity = 45
+	gravity = 80
 
 	is_jumping = false
 	jump_tolerance_trigger = false
 
 	-- how movement changes in the air
 	air_accel_control = 2.2
-	air_vel_control = 0.84
+	air_vel_control = 0.9
 	air_reactivity = 0.6
 	air_decay = 0.97
 
@@ -36,7 +40,7 @@ function love.load()
 	combo_time = 0
 	max_combo_time = 0.5
 
-	ground = love.graphics.getHeight() - 50
+	ground = love.graphics.getHeight() - 150
 end
 
 function calculate_horizontal_speed(direction, velocity)
@@ -62,7 +66,7 @@ function calculate_horizontal_speed(direction, velocity)
 	return velocity
 end
 
-function jump()
+function jump(force)
 	jump_vel = jump_force
 	is_jumping = true
 	jump_tolerance_trigger = false
@@ -72,7 +76,7 @@ function love.keypressed(key)
 	if key == "space" and not is_jumping then
 		jump()
 	elseif key == "space" and is_jumping then
-		if player.y >= 300 - jump_tolerance then
+		if player.y >= ground - jump_tolerance then
 			jump_tolerance_trigger = true
 			print("tolerance jump")
 		end
@@ -149,11 +153,34 @@ function love.update(dt)
 			combo_time = 0
 
 			if combo == "double a" then
-				vel = vel * 30
+				--impulse = 10000
+				--if is_jumping then impulse = impulse * 2 end
+
+				distance = 300
+				if is_jumping then distance = distance * 1.5 end
+				if love.keyboard.isDown("right") then
+					--vel = vel + impulse
+					player.x = player.x + distance
+				end
+				if love.keyboard.isDown("left") then
+					--vel = vel - impulse
+					player.x = player.x - distance
+				end
+				if love.keyboard.isDown("up") then
+					--jump_vel = jump_vel - impulse/15
+					player.y = player.y - distance/2
+					jump_vel = jump_vel + jump_force
+				end
+				if love.keyboard.isDown("down") then
+					--jump_vel = jump_vel - impulse/15
+					player.y = player.y + distance/2
+					if player.y >= ground then player.y = ground end
+				end
 			elseif combo == "ass" then
 				vel = 0
 			elseif combo == "asas" then
 				jump_vel = jump_vel - 2000
+				is_jumping = true
 			end
 		end
 	end
@@ -163,9 +190,7 @@ function love.update(dt)
 
 	player.x = player.x + vel * dt
 	player.y = player.y + jump_vel * dt
-	if player.y >= ground and is_jumping then
-		love.timer.sleep(0.02)
-	end
+
 	if player.y >= ground then
 		player.y = ground
 		jump_vel = 500
@@ -174,9 +199,12 @@ function love.update(dt)
 			jump()
 		end
 	end
+
+	if player.x > love.graphics.getWidth() then player.x = 0 end
+	if player.x < 0 then player.x = love.graphics.getWidth() end
 end
 
 function love.draw()
-	love.graphics.rectangle("line", player.x, player.y, 50, 50)
-	love.graphics.line(0, ground + 1, love.graphics.getWidth(), ground + 1)
+	love.graphics.rectangle("line", player.x, player.y, player.width, player.height)
+	love.graphics.line(0, ground + player.height + 1, love.graphics.getWidth(), ground + player.height + 1)
 end
