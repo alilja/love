@@ -4,33 +4,41 @@ function love.load()
 	player.y = 300
 
 	vel = 0
-	decay = 0.75
+	decay = 0.9
+	acceleration = 80 -- pixels per second
+	max_velocity = 600
+
+	jump_force = -850
+	jump_cutoff = -300 -- if your speed is below this, you are fixed to this speed
+					   -- basically, the lower this number, the sooner you are fixed
+					   -- to a low jump
+	jump_tolerance = 20 -- how far away from the ground can you be before you can
+						-- trigger a jump again; the jump happens as soon as the character
+						-- touches the ground
 
 	reactivity_percent = 1.95 -- how quickly you start moving in the opposite direction
 
 	jump_vel = 0
-	gravity = 11
+	gravity = 35
 
 	is_jumping = false
+	jump_tolerance_trigger = false
 
-	air_accel_control = 1.7
-	air_vel_control = 0.6
+	-- how movement changes in the air
+	air_accel_control = 2.2
+	air_vel_control = 0.7
 	air_reactivity = 0.3
 end
 
 function calculate_horizontal_speed(direction, time_since_press, velocity)
-	max_velocity = 600
 	reactivity = reactivity_percent
-	acceleration = 80 -- pixels per second
 	if is_jumping then
 		acceleration = acceleration * air_accel_control
 		reactivity = air_reactivity
 	end
 	if direction == "left" and velocity > 0 then -- moving right and press left
-		print("condition 1")
 		velocity = velocity - (acceleration + acceleration * reactivity_percent)
 	elseif direction == "right" and velocity < 0 then -- moving left and press right
-		print("condition 2")
 		velocity = velocity + (acceleration + acceleration * reactivity_percent)
 	elseif direction == "left" then
 		velocity = velocity - acceleration
@@ -45,16 +53,27 @@ function calculate_horizontal_speed(direction, time_since_press, velocity)
 	return velocity
 end
 
+function jump()
+	jump_vel = jump_force
+	is_jumping = true
+	jump_tolerance_trigger = false
+end
+
 function love.keypressed(key)
-   if key == "space" then
-   		jump_vel = -650
-   end
+	if key == "space" and not is_jumping then
+		jump()
+	elseif key == "space" and is_jumping then
+		if player.y >= 300 - jump_tolerance then
+			jump_tolerance_trigger = true
+			print("tolerance")
+		end
+	end
 end
 
 function love.keyreleased(key)
    if key == "space" then
-   		if jump_vel <= -400 then
-   			jump_vel = -400
+   		if jump_vel <= jump_cutoff then
+   			jump_vel = jump_cutoff
    		end
    end
 end
@@ -72,12 +91,19 @@ function love.update(dt)
 	jump_vel = jump_vel + gravity
 	if jump_vel > 500 then jump_vel = 500 end
 
-	print(jump_vel)
 	player.x = player.x + vel * dt
 	player.y = player.y + jump_vel * dt
-	if player.y >= 300 then player.y = 300; is_jumping = false; jump_vel = 500 end
+	if player.y >= 300 then
+		player.y = 300
+		jump_vel = 500
+		is_jumping = false
+		if jump_tolerance_trigger then
+			jump()
+		end
+	end
 end
 
 function love.draw()
 	love.graphics.rectangle("line", player.x, player.y, 50, 50)
+	love.graphics.line(0, 350, love.graphics.getWidth(), 350)
 end
