@@ -4,11 +4,11 @@ function love.load()
 	player.y = 300
 
 	vel = 0
-	decay = 0.9
-	acceleration = 80 -- pixels per second
+	decay = 0.85
+	acceleration = 50 -- pixels per second
 	max_velocity = 600
 
-	jump_force = -850
+	jump_force = -950
 	jump_cutoff = -300 -- if your speed is below this, you are fixed to this speed
 					   -- basically, the lower this number, the sooner you are fixed
 					   -- to a low jump
@@ -19,7 +19,7 @@ function love.load()
 	reactivity_percent = 1.95 -- how quickly you start moving in the opposite direction
 
 	jump_vel = 0
-	gravity = 35
+	gravity = 45
 
 	is_jumping = false
 	jump_tolerance_trigger = false
@@ -28,6 +28,7 @@ function love.load()
 	air_accel_control = 2.2
 	air_vel_control = 0.7
 	air_reactivity = 0.3
+	air_decay = 0.97
 end
 
 function calculate_horizontal_speed(direction, time_since_press, velocity)
@@ -85,7 +86,11 @@ function love.update(dt)
 	elseif love.keyboard.isDown("left") then
 		vel = calculate_horizontal_speed("left", left_key_down_time, vel)
 	else
-		vel = vel * decay
+		if is_jumping then
+			vel = vel * air_decay
+		else
+			vel = vel * decay
+		end
 	end
 
 	jump_vel = jump_vel + gravity
@@ -105,5 +110,5 @@ end
 
 function love.draw()
 	love.graphics.rectangle("line", player.x, player.y, 50, 50)
-	love.graphics.line(0, 350, love.graphics.getWidth(), 350)
+	love.graphics.line(0, 351, love.graphics.getWidth(), 351)
 end
