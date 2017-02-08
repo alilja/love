@@ -35,6 +35,8 @@ function love.load()
 	combos = {}
 	combo_time = 0
 	max_combo_time = 0.5
+
+	ground = love.graphics.getHeight() - 50
 end
 
 function calculate_horizontal_speed(direction, velocity)
@@ -161,11 +163,11 @@ function love.update(dt)
 
 	player.x = player.x + vel * dt
 	player.y = player.y + jump_vel * dt
-	if player.y >= 300 and is_jumping then
+	if player.y >= ground and is_jumping then
 		love.timer.sleep(0.02)
 	end
-	if player.y >= 300 then
-		player.y = 300
+	if player.y >= ground then
+		player.y = ground
 		jump_vel = 500
 		is_jumping = false
 		if jump_tolerance_trigger then
@@ -176,5 +178,5 @@ end
 
 function love.draw()
 	love.graphics.rectangle("line", player.x, player.y, 50, 50)
-	love.graphics.line(0, 351, love.graphics.getWidth(), 351)
+	love.graphics.line(0, ground + 1, love.graphics.getWidth(), ground + 1)
 end
