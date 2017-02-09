@@ -18,3 +18,5 @@ respecing should be a frequent and easy thing to do, based on the needs of the s
 procedural levels? rhythm-based?
 
 the gravity is high — it's hard to navigate in the air, but movement abilities are faster and stronger there
+
+complex combo to hack into robot brain, make it wander towards enemies, and explode and kill them
