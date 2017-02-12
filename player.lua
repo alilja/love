@@ -16,8 +16,14 @@ function Player.new(self)
 	self.animations = load_animation({
 			{"idle_left", "idle", "1-5", false},
 			{"idle_right", "idle", "1-5", true},
-			{"run_left", "run", "1-5", false},
-			{"run_right", "run", "1-5", true},
+			{"run_left", "run", "1-8", false},
+			{"run_right", "run", "1-8", true},
+			{"land_left", "land", "1-3", false},
+			{"land_right", "land", "1-3", true},
+			{"jump_left", "jump", "1-3", false},
+			{"jump_right", "jump", "1-3", true},
+			{"air_left", "air", "1-1", false},
+			{"air_right", "air", "1-1", true},
 		}, "images/an-1x/")
 
 	self.pose = "idle_left"
