@@ -44,8 +44,6 @@ function love.load()
 	reactivity_percent = 1.95 -- how quickly you start moving in the opposite direction
 
 	gravity = 60
-	hang_time = 0
-	max_hang_time = 0.5
 
 	jump_tolerance_trigger = false
 
@@ -59,14 +57,14 @@ function love.load()
 	combo_time = 0
 	max_combo_time = 0.5
 
-	ground = love.graphics.getHeight() - 150
+	ground = 300--love.graphics.getHeight() - 150
 
 	player = Player()
 end
 
 function calculate_horizontal_speed(direction, velocity)
 	reactivity = reactivity_percent
-	if player.is_jumping then
+	if player.state == STATE_JUMP then
 		acceleration = acceleration * air_accel_control
 		reactivity = air_reactivity
 	end
@@ -83,21 +81,14 @@ function calculate_horizontal_speed(direction, velocity)
 	if velocity > max_velocity then velocity = max_velocity end -- cap
 	if velocity < -max_velocity then velocity = -max_velocity end -- cap
 
-	if player.is_jumping then velocity = velocity * air_vel_control end
+	if player.state == STATE_JUMP then velocity = velocity * air_vel_control end
 	return velocity
 end
 
 
 
 function love.keypressed(key)
-	if key == "space" and not player.is_jumping then
-		player:jump()
-	elseif key == "space" and player.is_jumping then
-		if player.y >= ground - jump_tolerance then
-			jump_tolerance_trigger = true
-			print("tolerance jump")
-		end
-	end
+	player:handle_input(key)
 	if key == "a" then
 		print("a pressed")
 		table.insert(combos, "a")
