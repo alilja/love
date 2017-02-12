@@ -57,7 +57,7 @@ function love.load()
 	combo_time = 0
 	max_combo_time = 0.5
 
-	ground = 300--love.graphics.getHeight() - 150
+	ground = love.graphics.getHeight() - 150
 
 	player = Player()
 end
