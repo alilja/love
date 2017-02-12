@@ -48,7 +48,9 @@ function Player:handle_input(input)
 	held = held or false
 	if self.state ~= STATE_JUMP then
 		if input == "space" then
+			print(self.state)
 			self:jump(jump_force)
+			print(self.state)
 		end
 		if input == "right" then
 			self.vel.x = calculate_horizontal_speed("right", self.vel.x)
@@ -62,6 +64,9 @@ function Player:handle_input(input)
 		end
 		if input == "nil" then
 			self.vel.x = self.vel.x * decay
+			if math.abs(self.vel.x) < 1 then
+				self.state = STATE_IDLE
+			end
 		end
 	elseif self.state == STATE_JUMP then
 		if input == "space" then
@@ -106,7 +111,7 @@ function Player:update(dt)
 			if combo == "double a" then
 				--impulse = 10000
 				--if is_jumping then impulse = impulse * 2 end
-				self.max_hang_time = 0.1
+				self.max_hang_time = 0.3
 				distance = 300
 				if self.is_jumping then distance = distance * 1.5 end
 				if love.keyboard.isDown("right") then
@@ -120,7 +125,7 @@ function Player:update(dt)
 				if love.keyboard.isDown("up") then
 					--jump_vel = jump_vel - impulse/15
 					self.y = self.y - distance/2
-					self.max_hang_time = 0.3
+					self.max_hang_time = 0.6
 				end
 				if love.keyboard.isDown("down") then
 					--jump_vel = jump_vel - impulse/15
@@ -152,9 +157,6 @@ function Player:update(dt)
 		self.hang_time = self.hang_time + dt
 	end
 
-	if math.abs(self.vel.x) < 1 then
-		self.state = STATE_IDLE
-	end
 
 	self.x = self.x + self.vel.x * dt
 	self.y = self.y + self.vel.y * dt
