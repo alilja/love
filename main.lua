@@ -2,6 +2,8 @@ local inspect = require 'lib.inspect'
 local anim8 = require 'lib.anim8'
 Object = require "lib.classic"
 require 'player'
+require 'effects'
+require 'combos'
 
 function load_animation(animation_list, dir, format)
 	dir = dir or "images/"
@@ -60,6 +62,8 @@ function love.load()
 	ground = love.graphics.getHeight() - 150
 
 	player = Player()
+
+	aa_combo = Combo({Step("a", 0.5), Step("a", 0.5)})
 end
 
 function calculate_horizontal_speed(direction, velocity)
@@ -91,11 +95,9 @@ function love.keypressed(key)
 	player:handle_input(key)
 	if key == "a" then
 		print("a pressed")
-		table.insert(combos, "a")
 	end
 	if key == "s" then
 		print("s pressed")
-		table.insert(combos, "s")
 	end
 end
 
@@ -105,6 +107,9 @@ function love.keyreleased(key)
    			player.vel.y = jump_cutoff
    		end
    end
+   if aa_combo:check_key(key, 0.2) then
+		print("a combo")
+	end
 end
 
 function check_combos(combos)
