@@ -120,7 +120,7 @@ function Player:handle_input(input)
 	elseif self.state == STATE_JUMP then
 		if input == "space" then
 			print(self.world.ground - self.jump_tolerance)
-			if self.y >= ground - self.jump_tolerance then
+			if self.y >= world.ground - self.jump_tolerance then
 				self.jump_tolerance_trigger = true
 				print("tolerance jump")
 			end
@@ -172,7 +172,7 @@ function Player:update(dt)
 		self.y = world.ground
 		self.vel.y = 500
 		if math.abs(self.vel.x) > 1 then self.state = STATE_RUN else self.state = STATE_IDLE end
-		if jump_tolerance_trigger then
+		if self.jump_tolerance_trigger then
 			self:jump(self.jump_force)
 		end
 	end
