@@ -4,13 +4,17 @@ function Effect:new(duration)
 	self.life = 0
 	self.percent = 0
 
-	self.dead = false
+	FX_STATE_IN = 0
+	FX_STATE_MID = 1
+	FX_STATE_OUT = 2
+	FX_STATE_DEAD = -1
+	self.state = FX_STATE_IN
 end
 
 function Effect:update(dt)
 	self.life = self.life + dt
 	self.percent = self.life / self.duration
-	if self.life >= self.duration then self.dead = true end
+	if self.life >= self.duration then self.state = FX_STATE_DEAD end
 end
 
 --virtual function
@@ -91,7 +95,7 @@ function EffectManager:update(dt)
 	for i = #self.effects, 1, -1 do
 		--cull dead effects
 		effect = self.effects[i]
-		if effect.dead then
+		if effect.state == FX_STATE_DEAD then
 			table.remove(self.effects, i)
 		else
 			effect:update(dt)
