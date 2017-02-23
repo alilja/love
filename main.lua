@@ -54,7 +54,7 @@ end
 function love.keyreleased(key)
    if aa_combo:check_key(key, 0.2) then
 		print("a combo")
-		slow_time = 10
+		world.slow_time = 10
 	end
 
 	if key == "space" then
@@ -95,7 +95,7 @@ end
 
 
 function love.update(dt)
-	player:update(dt)
+	player:update(world:calculate_slow_time(dt))
 end
 
 function love.draw()

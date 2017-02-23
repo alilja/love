@@ -1,20 +1,33 @@
 Effect = Object:extend()
+-- Effect({in time, mid time, out time})
+-- Effect(lifespan)
 function Effect:new(duration)
-	self.duration = duration
-	self.life = 0
-	self.percent = 0
+	if type(duration) == "table" then
+		self.state_time_table = duration
+		self.current_state_time = duration[1]
+	else
+		self.current_state_time = duration
+	end
 
-	FX_STATE_IN = 0
-	FX_STATE_MID = 1
-	FX_STATE_OUT = 2
+	self.percent = 0 -- always the % complete through the current state
+	self.life = 0
+
+	FX_STATE_IN = 1
+	FX_STATE_MID = 2
+	FX_STATE_OUT = 3
 	FX_STATE_DEAD = -1
 	self.state = FX_STATE_IN
 end
 
 function Effect:update(dt)
 	self.life = self.life + dt
-	self.percent = self.life / self.duration
-	if self.life >= self.duration then self.state = FX_STATE_DEAD end
+	self.percent = self.life / self.current_state_time
+	if self.life >= self.current_state_time then
+		self.state = self.state + 1
+		if self.state > FX_STATE_OUT or self.state == FX_STATE_DEAD then self.state = FX_STATE_DEAD; return end
+		self.life = 0
+		self.current_state_time = self.state_time_table[self.state]
+	end
 end
 
 --virtual function
