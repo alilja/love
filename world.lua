@@ -22,7 +22,7 @@ function World:calculate_slow_time(dt)
 		self.slow_time_remaining = self.slow_time_remaining + (self.slow_time * dt)
 		print(self.slow_time_remaining)
 		if self.slow_time_remaining >= self.slow_time_return then
-			self.slow_time = self.slow_time - ((1 - self.slow_time)/(self.slow_time * dt - self.slow_time_return_speed))
+			self.slow_time = self.slow_time - (1 / self.slow_time_return_speed) * dt * self.slow_time^2
 			if self.slow_time <= 1 then
 				self.slow_time = 1
 				self.slow_time_remaining = 0
