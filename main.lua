@@ -36,63 +36,23 @@ function love.load()
 	world = World()
 	player = Player(world)
 
-	aa_combo = Combo({Step("a", 0.5), Step("a", 0.5)})
-
 end
 
 
 function love.keypressed(key)
 	player:handle_input(key)
-	if key == "a" then
-		print("a pressed")
-	end
-	if key == "s" then
-		print("s pressed")
-	end
 end
 
 function love.keyreleased(key)
-   if aa_combo:check_key(key, 0.2) then
-		print("a combo")
-		world.slow_time = 10
-	end
-
 	if key == "space" then
    		if player.vel.y <= player.jump_cutoff then
    			player.vel.y = player.jump_cutoff
    		end
    end
+   if key == "s" then
+   	world:slow(5, 5, 1)
+   end
 end
-
-function check_combos(combos)
-	if #combos == 4 then
-		if combos[1] == "a" then
-			if combos[2] == "s" then
-				if combos[3] == "a" then
-					if combos[4] == "s" then
-						return "asas"
-					end
-				end
-			end
-		end
-	elseif #combos == 3 then
-		if combos[1] == "a" then
-			if combos[2] == "s" then
-				if combos[3] == "s" then
-					return "ass"
-				end
-			end
-		end
-	elseif #combos == 2 then
-		if combos[1] == "a" then
-			if combos[2] == "a" then
-				return "double a"
-			end
-		end
-	end
-	return nil
-end
-
 
 function love.update(dt)
 	player:update(world:calculate_slow_time(dt))

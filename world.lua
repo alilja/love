@@ -14,6 +14,14 @@ function World:new()
 	self.slow_time_return = 2
 	self.slow_time_remaining = 0
 	self.slow_time_return_speed = 1
+	self.slow_max = 10
+end
+
+function World:slow(factor, duration, return_time)
+	self.slow_time = self.slow_time * factor
+	if self.slow_time > self.slow_max then self.slow_time = self.slow_max end
+	self.slow_time_return = duration
+	self.slow_time_return_speed = return_time
 end
 
 function World:calculate_slow_time(dt)
