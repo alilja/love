@@ -35,7 +35,12 @@ function love.load()
 
 	world = World()
 	player = Player(world)
-
+	combos = ComboManager({
+		Combo("aa_combo",{
+			Step("a", 0.5),
+			Step("a", 0.5)
+		})
+	})
 end
 
 
@@ -52,10 +57,13 @@ function love.keyreleased(key)
    if key == "s" then
    	world:slow(5, 5, 1)
    end
+	active_combo = combos:check(key)
+	print(active_combo)
 end
 
 function love.update(dt)
 	player:update(world:calculate_slow_time(dt))
+	combos:update(dt)
 end
 
 function love.draw()
