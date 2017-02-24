@@ -13,7 +13,7 @@ function World:new()
 	self.slow_time = 1
 	self.slow_time_return = 2
 	self.slow_time_remaining = 0
-	self.slow_time_return_speed = 5
+	self.slow_time_return_speed = 1
 end
 
 function World:calculate_slow_time(dt)
@@ -21,7 +21,8 @@ function World:calculate_slow_time(dt)
 		dt = dt * (1 / self.slow_time)
 		self.slow_time_remaining = self.slow_time_remaining + (self.slow_time * dt)
 		if self.slow_time_remaining >= self.slow_time_return then
-			self.slow_time = self.slow_time + ((self.slow_time) / -self.slow_time_return_speed) * (dt * self.slow_time))
+			-- going to need to know start and finish times to calculate a percentage, then scale the slow time by that percentage + 1
+			self.slow_time = self.slow_time + ((self.slow_time / -self.slow_time_return_speed) * (dt * self.slow_time^2))
 			print(self.slow_time)
 			print(self.slow_time_remaining)
 			if self.slow_time <= 1.01 then
