@@ -35,12 +35,13 @@ function love.load()
 
 	world = World()
 	player = Player(world)
+
 	combos = ComboTree()
 	a = combos:add_step("a")
 	b = combos:add_step("b")
-	combos:connect_steps(a, b, Move(0.1))
+	combos:connect_steps(a, b, Move(0.3))
 	combos:connect_steps(a, combos:add_step("c"), Move(0.1))
-	combos:connect_steps(b, combos:add_step("d"), Move(0.1))
+	combos:connect_steps(b, combos:add_step("d"), Move(0.5))
 	print("walking...")
 	combos:render_tree()
 end
