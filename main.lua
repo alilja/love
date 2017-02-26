@@ -35,12 +35,14 @@ function love.load()
 
 	world = World()
 	player = Player(world)
-	combos = ComboManager({
-		Combo("aa_combo",{
-			Step("a", 0.5),
-			Step("a", 0.5)
-		})
-	})
+	combos = ComboTree()
+	a = combos:add_step("a")
+	b = combos:add_step("b")
+	combos:connect_steps(a, b, Move(0.1))
+	combos:connect_steps(a, combos:add_step("c"), Move(0.1))
+	combos:connect_steps(b, combos:add_step("d"), Move(0.1))
+	print("walking...")
+	combos:render_tree()
 end
 
 
@@ -63,7 +65,6 @@ end
 
 function love.update(dt)
 	player:update(world:calculate_slow_time(dt))
-	combos:update(dt)
 end
 
 function love.draw()
